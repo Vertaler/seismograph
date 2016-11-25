@@ -3,7 +3,6 @@ from seismograph.utils import colors
 import re
 
 STUB_TEXT = "stub"
-from ..lib import case
 
 COLOR_CODES = {
     "red":   "\033\[31m",
@@ -13,7 +12,7 @@ COLOR_CODES = {
 }
 
 
-class ColorCase(case.BaseTestCase):
+class ColorCase(unittest.TestCase):
     def get_regex(self, color):
         return re.compile( '^' + COLOR_CODES[color] + STUB_TEXT )
 

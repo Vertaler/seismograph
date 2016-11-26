@@ -184,20 +184,3 @@ class CurrentTimeCase(unittest.TestCase):
     def test_today(self, mock_date):
         mock_date.today.return_value = STUB_DATE
         self.assertEqual(dateutils.today(HANDLER_STUB), STUB_DATE)
-
-
-
-        # def to_date(date, *handlers):
-        #     return _make_result(_dt.date(date.year, date.month, date.day), *handlers)
-        #
-        #
-        # def now(*handlers):
-        #    return _make_result(_dt.datetime.now(), *handlers)
-        #
-        #
-        # def date(year, month, day, *handlers):
-        #     return _make_result(_dt.date(year, month, day), *handlers)
-        #
-        #
-        # def today(*handlers):
-        #     return _make_result(_dt.date.today(), *handlers)

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from unittest import case
 from unittest import TestCase
 from seismograph.utils import mp
 
@@ -10,7 +9,7 @@ class ValueTest:
         self.value = value
 
 
-class MPEmptyVelueCase(TestCase):
+class MPEmptyValueCase(TestCase):
     
     def setUp(self):
         self.VALUE_STUB = mp.MPSupportedValue()

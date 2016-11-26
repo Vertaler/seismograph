@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
-from seismograph.utils import dateutils
-from dateutil.relativedelta import relativedelta
-import unittest
+import calendar
 import datetime
+import unittest
+import mock
+
+from dateutil.relativedelta import relativedelta
+
+from seismograph.utils import dateutils
 
 HANDLER_STUB = lambda x: x
 STUB_DATETIME = datetime.datetime.strptime('21.12.1991', '%d.%m.%Y')
@@ -11,19 +15,21 @@ STUB_DATETIME_FORMAT = '%Y***%m***%d***%H***%M***%S'
 STUB_DATE = STUB_DATETIME.date()
 
 STUB_SECONDS_DICT = {'seconds': 1}
+STUB_MINUTES_DICT = {'minutes': 1}
 STUB_HOURS_DICT = {'hours': 1}
 STUB_DAYS_DICT = {'days': 1}
-STUB_WEEKS_DICT = {'weeks':1}
-STUB_MONTHS_DICT = {'months' : 1}
+STUB_WEEKS_DICT = {'weeks': 1}
+STUB_MONTHS_DICT = {'months': 1}
 STUB_YEARS_DICT = {'years': 1}
 STUB_DELTA_DICT = {'days': 1, 'seconds': 1}
 
 STUB_SECONDS = datetime.timedelta(**STUB_SECONDS_DICT)
+STUB_MINUTES = datetime.timedelta(**STUB_MINUTES_DICT)
 STUB_HOURS = datetime.timedelta(**STUB_HOURS_DICT)
 STUB_DAYS = datetime.timedelta(**STUB_DAYS_DICT)
 STUB_WEEKS = relativedelta(**STUB_WEEKS_DICT)
-STUB_MONTHS  = relativedelta(**STUB_MONTHS_DICT)
-STUB_YEARS   = relativedelta(**STUB_YEARS_DICT)
+STUB_MONTHS = relativedelta(**STUB_MONTHS_DICT)
+STUB_YEARS = relativedelta(**STUB_YEARS_DICT)
 STUB_DELTA = datetime.timedelta(**STUB_DELTA_DICT)
 
 
@@ -66,11 +72,20 @@ class DateutilCase(unittest.TestCase):  # TODO Разбить тесты по н
         wrapped_func = dateutils.date_args_to_string(None)(arg_is_str)
         self.assertTrue(wrapped_func(STUB_DATE))
 
+    def test_date_args_to_string_with_no_date_args(self):
+        arg_is_zero = lambda arg: arg == 0
+        wrapped_func = dateutils.date_args_to_string(None)(arg_is_zero)
+        self.assertTrue(wrapped_func(0))
+
+    def test_date_args_to_string_with_date_kwargs(self):
+        arg_is_str = lambda arg: type(arg) is str
+        wrapped_func = dateutils.date_args_to_string(None)(arg_is_str)
+        self.assertTrue(wrapped_func(arg = STUB_DATE))
+
     def test_date_args_to_string_with_custom_format(self):
         arg_is_str = lambda arg: type(arg) is str
         wrapped_func = dateutils.date_args_to_string(STUB_DATE_FORMAT)(arg_is_str)
         self.assertTrue(wrapped_func(STUB_DATE))
-
 
     def test_minus_delta(self):
         right_value = STUB_DATE - STUB_DELTA
@@ -87,6 +102,14 @@ class DateutilCase(unittest.TestCase):  # TODO Разбить тесты по н
     def test_plus_seconds(self):
         right_value = STUB_DATE + STUB_SECONDS
         self.assertEqual(dateutils.plus_seconds(STUB_DATE, **STUB_SECONDS_DICT), right_value)
+
+    def test_minus_minutes(self):
+        right_value = STUB_DATE - STUB_MINUTES
+        self.assertEqual(dateutils.minus_minutes(STUB_DATE, **STUB_MINUTES_DICT), right_value)
+
+    def test_plus_minutes(self):
+        right_value = STUB_DATE + STUB_MINUTES
+        self.assertEqual(dateutils.plus_minutes(STUB_DATE, **STUB_MINUTES_DICT), right_value)
 
     def test_minus_hours(self):
         right_value = STUB_DATE - STUB_HOURS
@@ -128,4 +151,53 @@ class DateutilCase(unittest.TestCase):  # TODO Разбить тесты по н
         right_value = STUB_DATE + STUB_YEARS
         self.assertEqual(dateutils.plus_years(STUB_DATE, **STUB_YEARS_DICT), right_value)
 
+    def test_date(self):
+        params = [STUB_DATE.year, STUB_DATE.month, STUB_DATE.day, HANDLER_STUB]
+        self.assertEqual(dateutils.date(*params), STUB_DATE)
 
+    def test_to_date(self):
+        self.assertEqual(dateutils.to_date(STUB_DATETIME, HANDLER_STUB), STUB_DATETIME.date())
+
+
+class TransforDateCase(unittest.TestCase):
+    def test_to_start_month(self):
+        right_value = STUB_DATETIME.replace(day=1)
+        self.assertEqual(dateutils.to_start_month(STUB_DATETIME, HANDLER_STUB), right_value)
+
+    def test_to_start_year(self):
+        right_value = STUB_DATETIME.replace(day=1, month=1)
+        self.assertEqual(dateutils.to_start_year(STUB_DATETIME, HANDLER_STUB), right_value)
+
+    def test_to_end_month(self):
+        _, end_day = calendar.monthrange(STUB_DATETIME.year, STUB_DATETIME.month, )
+        right_value = STUB_DATETIME.replace(day=end_day)
+        self.assertEqual(dateutils.to_end_month(STUB_DATETIME, HANDLER_STUB), right_value)
+
+
+class CurrentTimeCase(unittest.TestCase):
+    @mock.patch('seismograph.utils.dateutils._dt.datetime')
+    def test_now(self, mock_datetime):
+        mock_datetime.now.return_value = STUB_DATETIME
+        self.assertEqual(dateutils.now(HANDLER_STUB), STUB_DATETIME)
+
+    @mock.patch('seismograph.utils.dateutils._dt.date')
+    def test_today(self, mock_date):
+        mock_date.today.return_value = STUB_DATE
+        self.assertEqual(dateutils.today(HANDLER_STUB), STUB_DATE)
+
+
+
+        # def to_date(date, *handlers):
+        #     return _make_result(_dt.date(date.year, date.month, date.day), *handlers)
+        #
+        #
+        # def now(*handlers):
+        #    return _make_result(_dt.datetime.now(), *handlers)
+        #
+        #
+        # def date(year, month, day, *handlers):
+        #     return _make_result(_dt.date(year, month, day), *handlers)
+        #
+        #
+        # def today(*handlers):
+        #     return _make_result(_dt.date.today(), *handlers)

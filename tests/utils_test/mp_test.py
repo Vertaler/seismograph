@@ -1,72 +1,52 @@
 # -*- coding: utf-8 -*-
+from unittest import case
+from unittest import TestCase
 from seismograph.utils import mp
-from ..lib import case
-import datetime
 
 INT_VAL = 123
-STRING_VAL = "@3274ghfedsj$"
+
+class ValueTest:
+    def __init__(self, value):
+        self.value = value
 
 
-class MPCase(case.BaseTestCase):
+class MPEmptyVelueCase(TestCase):
     
     def setUp(self):
-        self.VALUE_EMPTY_STUB = mp.MPSupportedValue()
-        self.VALUE_INT_STUB = mp.MPSupportedValue(value=INT_VAL)
-        self.VALUE_STRING_STUB = mp.MPSupportedValue(value=STRING_VAL)
-    
-    def test_empty_value(self):
-        self.assertEqual(self.VALUE_EMPTY_STUB.value, None)
+        self.VALUE_STUB = mp.MPSupportedValue()
 
-    def test_int_value(self):
-        self.assertEqual(self.VALUE_INT_STUB.value, INT_VAL)
+    def test_get_value(self):
+        self.assertEqual(self.VALUE_STUB.value, None)
 
-    def test_string_value(self):
-        self.assertEqual(self.VALUE_STRING_STUB.value, STRING_VAL)
+    def test_set_value(self):
+        self.VALUE_STUB.value = INT_VAL
+        self.assertEqual(self.VALUE_STUB.value, INT_VAL)
 
-    def test_property_set_int_to_empty(self):
-        ANOTHER_INT = 4234
-        self.VALUE_EMPTY_STUB.value = ANOTHER_INT
-        self.assertEqual(self.VALUE_EMPTY_STUB.value, ANOTHER_INT)
-        pass
-    
-    def test_property_set_int_to_int(self):
-        ANOTHER_INT = 423412323        
-        self.VALUE_INT_STUB.value = ANOTHER_INT
-        self.assertEqual(self.VALUE_INT_STUB.value, ANOTHER_INT)
-        pass
-    
-    def test_property_set_int_to_string(self):
-        ANOTHER_INT = 423489        
-        self.VALUE_STRING_STUB.value = ANOTHER_INT
-        self.assertEqual(self.VALUE_STRING_STUB.value, ANOTHER_INT)
-        pass
-    
-    def test_property_set_string_to_empty(self):
-        ANOTHER_STRING = "4234"
-        self.VALUE_EMPTY_STUB.value = ANOTHER_STRING
-        self.assertEqual(self.VALUE_EMPTY_STUB.value, ANOTHER_STRING)
-        pass
-    
-    def test_property_set_string_to_int(self):
-        ANOTHER_STRING = "423412323 "       
-        self.VALUE_INT_STUB.value = ANOTHER_STRING
-        self.assertEqual(self.VALUE_INT_STUB.value, ANOTHER_STRING)
-        pass
-    
-    def test_property_set_string_to_string(self):
-        ANOTHER_STRING = "423489"        
-        self.VALUE_STRING_STUB.value = ANOTHER_STRING
-        self.assertEqual(self.VALUE_STRING_STUB.value, ANOTHER_STRING)
-        pass
-    
-    def test_set_int_to_empty(self):
-        SET_VALUE = 908790765
-        self.VALUE_EMPTY_STUB.set(SET_VALUE)
-        self.assertEqual(self.VALUE_EMPTY_STUB.value, SET_VALUE)
-        pass
-    
-    def test_set_string_to_empty(self):
-        SET_VALUE = "90879076584092"
-        self.VALUE_EMPTY_STUB.set(SET_VALUE)
-        self.assertEqual(self.VALUE_EMPTY_STUB.value, SET_VALUE)
-        pass
+class MPPrimitiveValueCase(TestCase):
+    def setUp(self):
+        self.VALUE_STUB = mp.MPSupportedValue(INT_VAL)
+
+    def test_get_value(self):
+        self.assertEqual(self.VALUE_STUB.value, INT_VAL)
+
+    def test_set_value(self):
+        new_value = INT_VAL * 2
+        self.VALUE_STUB.value =new_value
+        self.assertEqual(self.VALUE_STUB.value, new_value)
+
+class MPObjectValueCase(TestCase):
+    def setUp(self):
+        self.VALUE_STUB = mp.MPSupportedValue( ValueTest(INT_VAL) )
+
+    def test_get_value(self):
+        self.assertEqual(self.VALUE_STUB.value, INT_VAL)
+
+    def test_set_value(self):
+        new_value = INT_VAL * 2
+        self.VALUE_STUB.value = new_value
+        self.assertEqual(self.VALUE_STUB.value, new_value)
+
+    def test_set_value_method(self):
+        new_value = INT_VAL * 2
+        self.VALUE_STUB.set(new_value)
+        self.assertEqual(self.VALUE_STUB.value, new_value)

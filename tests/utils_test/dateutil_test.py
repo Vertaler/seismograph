@@ -33,24 +33,34 @@ STUB_YEARS = relativedelta(**STUB_YEARS_DICT)
 STUB_DELTA = datetime.timedelta(**STUB_DELTA_DICT)
 
 
-class DateutilCase(unittest.TestCase):  # TODO Разбить тесты по нескольким кейсам
+class CommonDateutilCase(unittest.TestCase):
     def test_make_result(self):
         self.assertEqual(dateutils._make_result(STUB_DATE, HANDLER_STUB), STUB_DATE)
 
-    def test_make_copy_with_date(self):
+    def test_date(self):
+        params = [STUB_DATE.year, STUB_DATE.month, STUB_DATE.day, HANDLER_STUB]
+        self.assertEqual(dateutils.date(*params), STUB_DATE)
+
+    def test_to_date(self):
+        self.assertEqual(dateutils.to_date(STUB_DATETIME, HANDLER_STUB), STUB_DATETIME.date())
+
+
+class MakeCopyCase(unittest.TestCase):
+    def test_with_date(self):
         self.assertEqual(dateutils._make_copy(STUB_DATE), STUB_DATE)
 
-    def test_make_copy_with_datetime(self):
+    def test_with_datetime(self):
         self.assertEqual(dateutils._make_copy(STUB_DATETIME), STUB_DATETIME)
 
-    def test_make_copy_with_illegal_type(self):
+    def test_with_illegal_type(self):
         not_date = 'Definetilly not date'
-        callable = lambda: dateutils._make_copy(not_date)
-        self.assertRaises(TypeError, callableObj=callable)
+        self.assertRaises(TypeError,dateutils._make_copy, not_date)
 
-    def test_make_copy_with_explicit_class(self):
+    def test_with_explicit_class(self):
         self.assertEqual(dateutils._make_copy(STUB_DATETIME, datetime.datetime), STUB_DATETIME)
 
+
+class ToStringCase(unittest.TestCase):
     def test_date_to_string(self):
         right_value = STUB_DATE.strftime(dateutils.DEFAULT_DATE_FORMAT)
         self.assertEqual(dateutils.to_string(STUB_DATE), right_value)
@@ -67,26 +77,28 @@ class DateutilCase(unittest.TestCase):  # TODO Разбить тесты по н
         right_value = STUB_DATETIME.strftime(STUB_DATETIME_FORMAT)
         self.assertEqual(dateutils.to_string(STUB_DATETIME, STUB_DATETIME_FORMAT), right_value)
 
-    def test_date_args_to_string(self):
-        arg_is_str = lambda arg: type(arg) is str
-        wrapped_func = dateutils.date_args_to_string(None)(arg_is_str)
+
+class ArgsToStringCase(unittest.TestCase):
+    arg_is_str = lambda self, arg: type(arg) is str
+    arg_is_zero = lambda self ,arg: arg == 0
+
+    def test_with_date_args(self):
+        wrapped_func = dateutils.date_args_to_string(None)(self.arg_is_str)
         self.assertTrue(wrapped_func(STUB_DATE))
 
-    def test_date_args_to_string_with_no_date_args(self):
-        arg_is_zero = lambda arg: arg == 0
-        wrapped_func = dateutils.date_args_to_string(None)(arg_is_zero)
+    def test_with_no_date_args(self):
+        wrapped_func = dateutils.date_args_to_string(None)(self.arg_is_zero)
         self.assertTrue(wrapped_func(0))
 
-    def test_date_args_to_string_with_date_kwargs(self):
-        arg_is_str = lambda arg: type(arg) is str
-        wrapped_func = dateutils.date_args_to_string(None)(arg_is_str)
-        self.assertTrue(wrapped_func(arg = STUB_DATE))
+    def test_with_date_kwargs(self):
+        wrapped_func = dateutils.date_args_to_string(None)(self.arg_is_str)
+        self.assertTrue(wrapped_func(arg=STUB_DATE))
 
-    def test_date_args_to_string_with_custom_format(self):
-        arg_is_str = lambda arg: type(arg) is str
-        wrapped_func = dateutils.date_args_to_string(STUB_DATE_FORMAT)(arg_is_str)
+    def test_with_custom_format(self):
+        wrapped_func = dateutils.date_args_to_string(STUB_DATE_FORMAT)(self.arg_is_str)
         self.assertTrue(wrapped_func(STUB_DATE))
 
+class DeltaCase(unittest.TestCase):
     def test_minus_delta(self):
         right_value = STUB_DATE - STUB_DELTA
         self.assertEqual(dateutils.minus_delta(STUB_DATE, **STUB_DELTA_DICT), right_value)
@@ -151,13 +163,6 @@ class DateutilCase(unittest.TestCase):  # TODO Разбить тесты по н
         right_value = STUB_DATE + STUB_YEARS
         self.assertEqual(dateutils.plus_years(STUB_DATE, **STUB_YEARS_DICT), right_value)
 
-    def test_date(self):
-        params = [STUB_DATE.year, STUB_DATE.month, STUB_DATE.day, HANDLER_STUB]
-        self.assertEqual(dateutils.date(*params), STUB_DATE)
-
-    def test_to_date(self):
-        self.assertEqual(dateutils.to_date(STUB_DATETIME, HANDLER_STUB), STUB_DATETIME.date())
-
 
 class TransforDateCase(unittest.TestCase):
     def test_to_start_month(self):
@@ -184,3 +189,6 @@ class CurrentTimeCase(unittest.TestCase):
     def test_today(self, mock_date):
         mock_date.today.return_value = STUB_DATE
         self.assertEqual(dateutils.today(HANDLER_STUB), STUB_DATE)
+
+if __name__ == '__main__':
+    unittest.main()

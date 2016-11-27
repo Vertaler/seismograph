@@ -1,13 +1,11 @@
-from unittest import TestCase
+import unittest
 from seismograph.utils import std
 
 import mock
 import sys
 
-INT_VAL = 123
 
-
-class STDCase(TestCase):
+class STDCase(unittest.TestCase):
     def setUp(self):
         self.stream_mock = mock.Mock()
 
@@ -27,3 +25,6 @@ class STDCase(TestCase):
         with(std.capture_output(self.stream_mock)):
             self.assertEqual(sys.stderr, self.stream_mock)
 
+
+if __name__ == '__main__':
+    unittest.main()

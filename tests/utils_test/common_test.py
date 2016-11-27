@@ -174,3 +174,7 @@ class WaitingForCase(unittest.TestCase):
             common.waiting_for(self.mock_func, TIMEOUT_STUB, delay=DELAY_STUB)
         except:
             self.assertGreater(mock_sleep.call_count, 0)
+
+
+if __name__ == '__main__':
+    unittest.main()

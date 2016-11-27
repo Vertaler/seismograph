@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
+
 from seismograph.utils import mp
 
 INT_VAL = 123

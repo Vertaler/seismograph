@@ -1,8 +1,9 @@
+import sys
 import unittest
-from seismograph.utils import std
 
 import mock
-import sys
+
+from seismograph.utils import std
 
 
 class STDCase(unittest.TestCase):
@@ -24,6 +25,16 @@ class STDCase(unittest.TestCase):
     def test_capture_output_stderr(self):
         with(std.capture_output(self.stream_mock)):
             self.assertEqual(sys.stderr, self.stream_mock)
+
+    def test_dev_null_stdout(self):
+        stdout = sys.stdout
+        with(std.dev_null()):
+            self.assertNotEqual(sys.stdout, stdout)
+
+    def test_dev_null_stderr(self):
+        stderr = sys.stderr
+        with(std.dev_null()):
+            self.assertNotEqual(sys.stderr, stderr)
 
 
 if __name__ == '__main__':

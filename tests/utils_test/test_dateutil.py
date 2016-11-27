@@ -2,8 +2,8 @@
 import calendar
 import datetime
 import unittest
-import mock
 
+import mock
 from dateutil.relativedelta import relativedelta
 
 from seismograph.utils import dateutils
@@ -81,7 +81,7 @@ class ToStringCase(unittest.TestCase):
 class ArgsToStringCase(unittest.TestCase):
     arg_is_str = lambda self, arg: type(arg) is str
     arg_is_zero = lambda self ,arg: arg == 0
-  
+
     def test_with_date_args(self):
         wrapped_func = dateutils.date_args_to_string(None)(self.arg_is_str)
         self.assertTrue(wrapped_func(STUB_DATE))

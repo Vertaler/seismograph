@@ -1,6 +1,7 @@
-import unittest
-from seismograph.utils import colors
 import re
+import unittest
+
+from seismograph.utils import colors
 
 STUB_TEXT = "stub"
 

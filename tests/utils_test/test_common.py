@@ -172,7 +172,9 @@ class WaitingForCase(unittest.TestCase):
         self.mock_func.return_value = None
         try:
             common.waiting_for(self.mock_func, TIMEOUT_STUB, delay=DELAY_STUB)
-        except:
+        except TimeoutException:
+            pass
+        finally:
             self.assertGreater(mock_sleep.call_count, 0)
 
 
